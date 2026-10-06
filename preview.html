@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>dsh-frost-ice · 离线预览</title>
+<style>
+  /* 预览页自带一份 DSH 的关键 token（浅色基线原值），这样 without-plugin / with-plugin
+     两栏可以直接对比：文字 token 在两边完全一致，只有背景与描边不同。 */
+  :root {
+    --dsw-static-neutral-bluish-00: #fff;
+    --dsw-static-neutral-bluish-50: #f9fafb;
+    --dsw-static-neutral-bluish-200: #e1e5ee;
+    --dsw-static-neutral-bluish-300: #cfd3d6;
+    --dsw-static-neutral-bluish-1000: #0f1115;
+    --dsw-static-blue-500: #3b82f6;
+    --dsw-static-blue-450: #4d93f8;
+    --dsw-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --ds-font-family-code: "SF Mono", "JetBrains Mono", "Fira Code", Consolas, Menlo, monospace;
+  }
+
+  /* === 未装皮肤（DSH 原版浅色）=== */
+  .panel-default {
+    --dsw-alias-bg-base: #fff;
+    --dsw-alias-bg-layer-1: #fff;
+    --dsw-alias-bg-layer-2: #fff;
+    --dsw-alias-bg-layer-3: #fff;
+    --dsw-alias-bg-overlay: #fff;
+    --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-1000);
+    --dsw-alias-label-secondary: #61666b;
+    --dsw-alias-label-caption: #979da6;
+    --dsw-alias-border-l1: #0000000a;
+    --dsw-alias-border-l2: #0000001a;
+    --dsw-alias-border-l4: #00000029;
+    --dsw-alias-interactive-bg-hover: #2631480f;
+    --dsw-alias-button-primary-fill: var(--dsw-static-blue-500);
+    --dsw-alias-label-primary-foreground: #fff;
+    --dsw-alias-scrollbar-bg-l1: #0000001a;
+  }
+
+  /* === 装了 dsh-frost-ice：以下全部由 client.js 注入，这里复制一份供离线预览 ===
+     真实 DSH 里选择器是 html:has(body[data-dsh-frost-ice]) / body[data-dsh-frost-ice]；
+     预览页里为了让左右两栏能同屏对比，把同样的规则挂在 .frost-ice 容器上。 */
+  .frost-ice:has(.app) {
+    background:
+      radial-gradient(1200px 800px at 12% -10%, #d8e8ff 0%, rgba(216, 232, 255, 0) 62%),
+      radial-gradient(1000px 700px at 98% 6%, #e6f0ff 0%, rgba(230, 240, 255, 0) 58%),
+      radial-gradient(900px 600px at 50% 108%, #deeafb 0%, rgba(222, 234, 251, 0) 60%),
+      linear-gradient(160deg, #f2f8ff 0%, #eaf3ff 45%, #e2eefe 100%);
+  }
+  .frost-ice .glass { backdrop-filter: blur(18px) saturate(150%); -webkit-backdrop-filter: blur(18px) saturate(150%); }
+  .frost-ice .glass.solid { backdrop-filter: blur(10px) saturate(140%); -webkit-backdrop-filter: blur(10px) saturate(140%); }
+
+  .frost-ice {
+    --dsw-alias-bg-base: rgba(247, 252, 255, 0.3);
+    --dsw-alias-bg-layer-1: rgba(255, 255, 255, 0.62);
+    --dsw-alias-bg-layer-2: rgba(255, 255, 255, 0.78);
+    --dsw-alias-bg-layer-3: rgba(255, 255, 255, 0.92);
+    --dsw-alias-bg-overlay: rgba(255, 255, 255, 0.9);
+    --dsw-alias-label-primary: var(--dsw-static-neutral-bluish-1000);
+    --dsw-alias-label-secondary: #61666b;
+    --dsw-alias-label-caption: #979da6;
+    --dsw-alias-border-l1: rgba(36, 86, 166, 0.08);
+    --dsw-alias-border-l2: rgba(36, 86, 166, 0.14);
+    --dsw-alias-border-l4: rgba(36, 86, 166, 0.24);
+    --dsw-alias-interactive-bg-hover: rgba(38, 49, 72, 0.08);
+    --dsw-alias-button-primary-fill: #a9ccf7;
+    --dsw-alias-label-primary-foreground: #0f1115;
+    --dsw-alias-scrollbar-bg-l1: rgba(69, 110, 168, 0.18);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 28px;
+    font-family: var(--dsw-font-family);
+    font-size: 14px;
+    line-height: 1.65;
+    color: #0f1115;
+    background: #fff;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .lede { color: #61666b; margin: 0 0 24px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  .col > h2 { font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #81858c; margin: 0 0 10px; }
+
+  .stage { border-radius: 14px; overflow: hidden; border: 1px solid rgba(0,0,0,.06); }
+  .app { display: grid; grid-template-columns: 168px 1fr; min-height: 430px; }
+
+  .side { padding: 12px; background: var(--dsw-alias-bg-layer-1); border-right: .5px solid var(--dsw-alias-border-l2); }
+  .side .brand { font-weight: 700; margin-bottom: 14px; color: var(--dsw-alias-label-primary); }
+  .side .row { padding: 6px 8px; border-radius: 8px; color: var(--dsw-alias-label-secondary); }
+  .side .row.on { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+
+  .main { display: flex; flex-direction: column; background: var(--dsw-alias-bg-base); }
+  .head { padding: 10px 14px; border-bottom: .5px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-primary); font-weight: 600; background: var(--dsw-alias-bg-layer-1); }
+  .body { padding: 16px; flex: 1; }
+  .body p { margin: 0 0 12px; }
+  .body h3 { margin: 0 0 8px; font-size: 15px; }
+  .muted { color: var(--dsw-alias-label-caption); }
+  code { font-family: var(--ds-font-family-code); font-size: 13px; background: rgba(65,118,230,.08); padding: 1px 5px; border-radius: 5px; }
+  pre { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; background: var(--dsw-alias-bg-layer-2); border: .5px solid var(--dsw-alias-border-l2); overflow: auto; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 0 0 12px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: .5px solid var(--dsw-alias-border-l2); }
+  th { color: var(--dsw-alias-label-caption); font-weight: 600; }
+
+  .composer { margin: 0 14px 14px; padding: 10px 12px; border-radius: 12px; background: var(--dsw-alias-bg-layer-2); border: .5px solid var(--dsw-alias-border-l2); color: var(--dsw-alias-label-caption); display: flex; align-items: center; justify-content: space-between; }
+  .btn { padding: 6px 14px; border-radius: 8px; border: none; background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-primary-foreground); font: inherit; font-weight: 600; }
+  .btn.ghost { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); font-weight: 500; }
+
+  .float { position: relative; margin-top: -34px; margin-left: 120px; width: 210px; padding: 10px 12px; border-radius: 12px; background: var(--dsw-alias-bg-overlay); border: .5px solid var(--dsw-alias-border-l4); box-shadow: 0 12px 32px rgba(0,0,0,.08); }
+  .float .item { padding: 5px 6px; border-radius: 6px; }
+  .float .item.hot { background: var(--dsw-alias-interactive-bg-hover); }
+</style>
+</head>
+<body>
+  <h1>dsh-frost-ice · 离线预览</h1>
+  <p class="lede">左栏是 DSH 原版浅色基线；右栏是装上皮肤后的效果。<strong>两栏的文字颜色 token 完全相同</strong>（正文 #0f1115 近黑、次要 #61666b），区别只在背景透明度、描边色和 backdrop-filter。</p>
+
+  <div class="grid">
+    <div class="col">
+      <h2>① 未装皮肤（DSH 原版）</h2>
+      <div class="stage panel-default" id="stage-default"></div>
+    </div>
+    <div class="col">
+      <h2>② 已装皮肤（冰蓝磨砂）</h2>
+      <div class="frost-ice">
+        <div class="stage" id="stage-frost"></div>
+      </div>
+    </div>
+  </div>
+
+  <template id="app-template">
+    <div class="app">
+      <div class="side">
+        <div class="brand">DeepSeek Harness</div>
+        <div class="row on">新的会话</div>
+        <div class="row">皮肤插件开发</div>
+        <div class="row">会话记录 2026-02</div>
+      </div>
+      <div class="main">
+        <div class="head">皮肤插件开发</div>
+        <div class="body">
+          <h3>冰蓝磨砂皮肤说明</h3>
+          <p>正文保持 <code>--dsw-alias-label-primary</code>，也就是 <code>#0f1115</code> 近黑，所以阅读体验和原版一致。行内代码与代码块背景同样沿用 DSH 的 token。</p>
+          <table>
+            <thead><tr><th>层级</th><th>背景 token</th><th>透明度</th></tr></thead>
+            <tbody>
+              <tr><td>页面底</td><td>bg-base</td><td>0.30</td></tr>
+              <tr><td>侧栏</td><td>bg-layer-1</td><td>0.62</td></tr>
+              <tr><td>面板</td><td>bg-layer-2</td><td>0.78</td></tr>
+            </tbody>
+          </table>
+          <pre><code>ctx.theme.overrideTokens('dsh-frost-ice', tokens)</code></pre>
+          <p class="muted">次要文字（caption）在两层背景上都保持可读。</p>
+        </div>
+        <div class="composer"><span>给 DeepSeek Harness 发消息…</span><button class="btn">发送</button></div>
+      </div>
+    </div>
+    <div class="float glass solid">
+      <div class="item hot">设置</div>
+      <div class="item">插件市场</div>
+      <div class="item">导出配置</div>
+    </div>
+  </template>
+
+  <script>
+    const tpl = document.getElementById('app-template')
+    for (const id of ['stage-default', 'stage-frost']) {
+      document.getElementById(id).appendChild(tpl.content.cloneNode(true))
+    }
+  </script>
+</body>
+</html>

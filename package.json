@@ -1,0 +1,76 @@
+{
+  "name": "dsh-frost-ice",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DSH Web GUI 皮肤：极淡冰蓝磨砂玻璃背景（frosted / acrylic），正文保持近黑以不影响阅读。",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "client-plugin",
+    "theme",
+    "skin",
+    "frosted-glass",
+    "acrylic"
+  ],
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-theme"
+      ]
+    }
+  },
+  "dshhub": {
+    "schemaVersion": 1,
+    "displayName": "dsh-frost-ice 冰蓝磨砂",
+    "summary": "DSH Web GUI 皮肤：极淡冰蓝磨砂玻璃背景，正文保持近黑 #0f1115 不影响阅读。",
+    "categories": [
+      "theme",
+      "ui"
+    ],
+    "surfaces": [
+      "web"
+    ],
+    "capabilities": {
+      "provides": []
+    },
+    "compatibility": {
+      "dsh": ">=0.1.5-rc.1",
+      "node": ">=20"
+    },
+    "permissions": {},
+    "screenshots": [
+      "real-skinned.png",
+      "real-settings.png",
+      "real-default.png"
+    ]
+  },
+  "exports": {
+    ".": "./client/client.js",
+    "./client": "./client/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "client",
+    "test",
+    "README.md",
+    "preview.html",
+    "preview.png"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-client-ui-theme": "^0.1.5-rc.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-theme": {
+      "optional": true
+    }
+  }
+}

@@ -1,7 +1,6 @@
 {
   "name": "dsh-frost-ice",
   "version": "0.1.0",
-  "private": true,
   "description": "DSH Web GUI 皮肤：极淡冰蓝磨砂玻璃背景（frosted / acrylic），正文保持近黑以不影响阅读。",
   "type": "module",
   "license": "MIT",
@@ -59,7 +58,10 @@
     "test",
     "README.md",
     "preview.html",
-    "preview.png"
+    "preview.png",
+    "real-skinned.png",
+    "real-settings.png",
+    "real-default.png"
   ],
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.2",
